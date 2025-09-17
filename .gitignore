@@ -1,0 +1,8 @@
+# ignore everything
+*
+
+# except
+!main.c
+!.gitignore
+!LICENSE
+!README.md
