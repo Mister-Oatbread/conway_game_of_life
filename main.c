@@ -16,8 +16,8 @@
 #define ACTIVE true
 #define INACTIVE false
 
-#define NUMBER_OF_COLUMNS 100
-#define NUMBER_OF_ROWS 50
+#define NUMBER_OF_COLUMNS 10
+#define NUMBER_OF_ROWS 5
 #define STATE_SIZE NUMBER_OF_COLUMNS*NUMBER_OF_ROWS // 100*50 = 5000
 #define FULL "■"
 #define EMPTY "□"
@@ -38,7 +38,7 @@ void write_cell_state_from_to(bool *next_state, bool *state);
 bool cell_is_active(bool *state, const short x_coordinate, const short y_coordinate);
 bool cell_inside_bounds(const short x_coordinate, const short y_coordinate);
 int calculate_index_with_coordinates(const short x_coordinate, const short y_coordinate);
-void update_all_cells(bool *state);
+void update_all_cells(bool *state, bool *next_state);
 void print_state(bool *state);
 short get_active_neighbours(bool *state, const short x_coordinate, const short y_coordinate);
 void update_time(long *p_current_time);
@@ -52,10 +52,20 @@ int main(void) {
     bool next_state[STATE_SIZE] = {false};
 
     // initial condition
-    set_cell_status(state, 20, 20, ACTIVE);
-    set_cell_status(state, 21, 21, ACTIVE);
-    set_cell_status(state, 21, 20, ACTIVE);
-    set_cell_status(state, 20, 21, ACTIVE);
+    set_cell_status(state, 4, 2, ACTIVE);
+    set_cell_status(state, 4, 3, ACTIVE);
+    set_cell_status(state, 5, 2, ACTIVE);
+    set_cell_status(state, 5, 3, ACTIVE);
+    set_cell_status(state, 6, 2, ACTIVE);
+    set_cell_status(state, 6, 3, ACTIVE);
+    set_cell_status(state, 7, 2, ACTIVE);
+    set_cell_status(state, 7, 3, ACTIVE);
+    set_cell_status(state, 8, 2, ACTIVE);
+    set_cell_status(state, 8, 3, ACTIVE);
+    set_cell_status(state, 9, 2, ACTIVE);
+    set_cell_status(state, 9, 3, ACTIVE);
+    set_cell_status(state, 4, 4, ACTIVE);
+
     print_state(state);
 
     // set up time, for now this precise to one second
@@ -70,7 +80,7 @@ int main(void) {
             update_time(&last_update);
             // TODO: use cooler time
 
-            update_all_cells(next_state);
+            update_all_cells(state, next_state);
 
             write_cell_state_from_to(next_state, state);
             print_state(state);
@@ -78,6 +88,7 @@ int main(void) {
         }
     }
 
+    // return zero
     return 0;
 }
 
@@ -174,8 +185,11 @@ void print_state(bool *state) {
 
 /**
  * This function can be called to update the cell matrix
+ * To evaluate which cells should live or die, use state.
+ * To write the decision, use next_state.
+ * Later copy everything
  */
-void update_all_cells(bool *state) {
+void update_all_cells(bool *state, bool *next_state) {
 
     int index;
     short number_of_active_neighbours;
@@ -193,16 +207,16 @@ void update_all_cells(bool *state) {
                 number_of_active_neighbours = get_active_neighbours(state, x_coordinate, y_coordinate);
             }
 
-            p_current_cell = state+index;
+            p_current_cell = next_state+index;
 
             // decide if cell should be alive or dead in next step
-            // under 2 -> die
-            // 2 or 3 -> live
-            // over 3 -> die
-            // exactly 3 from neighbour -> live
+            // under 2 -> dead
+            // 2 or 3 -> alive
+            // over 3 -> dead
+            // exactly 3 from neighbour -> alive
             if (number_of_active_neighbours < 2) {
                 *p_current_cell = INACTIVE;
-            } else if (number_of_active_neighbours >3) {
+            } else if (number_of_active_neighbours > 3) {
                 *p_current_cell = INACTIVE;
             } else {
                 *p_current_cell = ACTIVE;
@@ -236,6 +250,7 @@ short get_active_neighbours(bool *state, const short x_coordinate, const short y
             }
         }
     }
+    printf("%d\n", number_of_active_neighbours);
     return number_of_active_neighbours;
 }
 
