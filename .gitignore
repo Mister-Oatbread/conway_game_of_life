@@ -3,6 +3,8 @@
 
 # except
 !main.c
+!init.c
+!initial_condition.csv
 !.gitignore
 !LICENSE
 !README.md

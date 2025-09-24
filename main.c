@@ -2,44 +2,17 @@
 
 /**
  * Conway's game of life
+ * Main File with all the functionality
  *
  * Author: Mister Oatbread
  */
 
 #include <complex.h>
-#include <stdio.h>
 #include <time.h>
-#include <stdbool.h>
 #include <locale.h>
-
-// cool macros
-#define ACTIVE true
-#define INACTIVE false
-
-#define NUMBER_OF_COLUMNS 4
-#define NUMBER_OF_ROWS 4
-#define STATE_SIZE NUMBER_OF_COLUMNS*NUMBER_OF_ROWS // 100*50 = 5000
-#define FULL "■"
-#define EMPTY "□"
-
-#define REFRESH_RATE 1
-
-#define DAYS2SEC 86400
-#define HOURS2SEC 3600
-#define MIN2SEC 60
+#include "gol.h"
 
 short number_of_printed_rows = 0;
-
-// prototyping
-void set_cell_status(bool *state, const short x_coordinate, const short y_coordinate, const bool operation);
-void write_cell_state_from_to(bool *next_state, bool *state);
-bool cell_is_active(bool *state, const short x_coordinate, const short y_coordinate);
-bool cell_inside_bounds(const short x_coordinate, const short y_coordinate);
-int calculate_index_with_coordinates(const short x_coordinate, const short y_coordinate);
-void update_all_cells(bool *state, bool *next_state);
-void print_state(bool *state);
-short get_number_of_active_neighbours(bool *state, const short x_coordinate, const short y_coordinate);
-void update_time(long *p_current_time);
 
 int main(void) {
 
@@ -48,12 +21,6 @@ int main(void) {
     printf("Conway's game of life by Mister Oatbread\n\n");
     bool state[STATE_SIZE] = {false};
     bool next_state[STATE_SIZE] = {false};
-
-    // initial condition
-    set_cell_status(state, 2, 2, ACTIVE);
-    set_cell_status(state, 3, 2, ACTIVE);
-    set_cell_status(state, 2, 3, ACTIVE);
-    set_cell_status(state, 3, 3, ACTIVE);
 
     print_state(state);
 
@@ -77,6 +44,22 @@ int main(void) {
 
     // return zero
     return 0;
+}
+
+/**
+ * this function takes in the "initial_condition.csv" file and writes this initial condition
+ * to the initial state.
+ */
+void read_apply_initial_condition(bool *state) {
+    FILE *initial_condition = fopen("initial_condition.csv", "r");
+    char * line = malloc(SIZE_ENTRY*NUMBER_OF_COLUMNS + 1);
+
+    int index;
+    for (short x_coordinate = 0; x_coordinate < NUMBER_OF_COLUMNS; x_coordinate++) {
+        for (short y_coordinate = 0; y_coordinate < NUMBER_OF_ROWS; y_coordinate++) {
+            index = calculate_index_with_coordinates(x_coordinate, y_coordinate);
+        }
+    }
 }
 
 /**
