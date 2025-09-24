@@ -28,10 +28,6 @@
 #define HOURS2SEC 3600
 #define MIN2SEC 60
 
-// this index tracks how many lines have been actively written by the program
-// and can be used to delete as many
-short number_of_lines_printed = 0;
-
 // prototyping
 void set_cell_status(bool *state, const short x_coordinate, const short y_coordinate, const bool operation);
 void write_cell_state_from_to(bool *next_state, bool *state);
@@ -40,7 +36,7 @@ bool cell_inside_bounds(const short x_coordinate, const short y_coordinate);
 int calculate_index_with_coordinates(const short x_coordinate, const short y_coordinate);
 void update_all_cells(bool *state, bool *next_state);
 void print_state(bool *state);
-short get_active_neighbours(bool *state, const short x_coordinate, const short y_coordinate);
+short get_number_of_active_neighbours(bool *state, const short x_coordinate, const short y_coordinate);
 void update_time(long *p_current_time);
 
 int main(void) {
@@ -56,15 +52,6 @@ int main(void) {
     set_cell_status(state, 4, 3, ACTIVE);
     set_cell_status(state, 5, 2, ACTIVE);
     set_cell_status(state, 5, 3, ACTIVE);
-    set_cell_status(state, 6, 2, ACTIVE);
-    set_cell_status(state, 6, 3, ACTIVE);
-    set_cell_status(state, 7, 2, ACTIVE);
-    set_cell_status(state, 7, 3, ACTIVE);
-    set_cell_status(state, 8, 2, ACTIVE);
-    set_cell_status(state, 8, 3, ACTIVE);
-    set_cell_status(state, 9, 2, ACTIVE);
-    set_cell_status(state, 9, 3, ACTIVE);
-    set_cell_status(state, 4, 4, ACTIVE);
 
     print_state(state);
 
@@ -79,9 +66,7 @@ int main(void) {
         if (now > last_update + REFRESH_RATE) {
             update_time(&last_update);
             // TODO: use cooler time
-
             update_all_cells(state, next_state);
-
             write_cell_state_from_to(next_state, state);
             print_state(state);
 
@@ -162,10 +147,9 @@ int calculate_index_with_coordinates(const short x_coordinate, const short y_coo
  */
 void print_state(bool *state) {
     // TODO: change this to not delete a bunch of stuff at the first iteration
-    for (int index=0; index<number_of_lines_printed; index++) {
+    for (int index=0; index<NUMBER_OF_ROWS; index++) {
         printf("\033[A\033[2K");
     }
-    number_of_lines_printed = 0;
 
     for (int index=0; index<STATE_SIZE; index++) {
         // check what to print, and add spacer for more visual consisteny between rows and columns
@@ -178,7 +162,6 @@ void print_state(bool *state) {
         // at the end of row, insert linebreak
         if (index%NUMBER_OF_COLUMNS == NUMBER_OF_COLUMNS-1) {
             printf("\n");
-            number_of_lines_printed++;
         }
     }
 }
@@ -204,7 +187,7 @@ void update_all_cells(bool *state, bool *next_state) {
                 printf("updating cells found something out of bounds dingus\n");
                 continue;
             } else {
-                number_of_active_neighbours = get_active_neighbours(state, x_coordinate, y_coordinate);
+                number_of_active_neighbours = get_number_of_active_neighbours(state, x_coordinate, y_coordinate);
             }
 
             p_current_cell = next_state+index;
@@ -230,7 +213,7 @@ void update_all_cells(bool *state, bool *next_state) {
  * This function returns the active cell count for a given x and y coordinate
  * Bounds check should ideally happen before.
  */
-short get_active_neighbours(bool *state, const short x_coordinate, const short y_coordinate) {
+short get_number_of_active_neighbours(bool *state, const short x_coordinate, const short y_coordinate) {
 
     short number_of_active_neighbours = 0;
     bool cell_active;
@@ -240,7 +223,7 @@ short get_active_neighbours(bool *state, const short x_coordinate, const short y
     // by ±1
     for (short dx=-1; dx<=1; dx++) {
         for (short dy=-1; dy<=1; dy++) {
-            if (cell_inside_bounds(x_coordinate+dx, y_coordinate+dy)) {
+            if (cell_inside_bounds(x_coordinate + dx, y_coordinate + dy)) {
                 cell_active = cell_is_active(state, x_coordinate + dx, y_coordinate + dy);
                 not_original_cell = (dx != 0) && (dy != 0);
 
