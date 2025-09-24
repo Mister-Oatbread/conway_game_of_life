@@ -16,8 +16,8 @@
 #define ACTIVE true
 #define INACTIVE false
 
-#define NUMBER_OF_COLUMNS 10
-#define NUMBER_OF_ROWS 5
+#define NUMBER_OF_COLUMNS 4
+#define NUMBER_OF_ROWS 4
 #define STATE_SIZE NUMBER_OF_COLUMNS*NUMBER_OF_ROWS // 100*50 = 5000
 #define FULL "■"
 #define EMPTY "□"
@@ -27,6 +27,8 @@
 #define DAYS2SEC 86400
 #define HOURS2SEC 3600
 #define MIN2SEC 60
+
+short number_of_printed_rows = 0;
 
 // prototyping
 void set_cell_status(bool *state, const short x_coordinate, const short y_coordinate, const bool operation);
@@ -48,10 +50,10 @@ int main(void) {
     bool next_state[STATE_SIZE] = {false};
 
     // initial condition
-    set_cell_status(state, 4, 2, ACTIVE);
-    set_cell_status(state, 4, 3, ACTIVE);
-    set_cell_status(state, 5, 2, ACTIVE);
-    set_cell_status(state, 5, 3, ACTIVE);
+    set_cell_status(state, 2, 2, ACTIVE);
+    set_cell_status(state, 3, 2, ACTIVE);
+    set_cell_status(state, 2, 3, ACTIVE);
+    set_cell_status(state, 3, 3, ACTIVE);
 
     print_state(state);
 
@@ -147,9 +149,10 @@ int calculate_index_with_coordinates(const short x_coordinate, const short y_coo
  */
 void print_state(bool *state) {
     // TODO: change this to not delete a bunch of stuff at the first iteration
-    for (int index=0; index<NUMBER_OF_ROWS; index++) {
+    for (int index=0; index<number_of_printed_rows; index++) {
         printf("\033[A\033[2K");
     }
+    number_of_printed_rows = 0;
 
     for (int index=0; index<STATE_SIZE; index++) {
         // check what to print, and add spacer for more visual consisteny between rows and columns
@@ -162,6 +165,7 @@ void print_state(bool *state) {
         // at the end of row, insert linebreak
         if (index%NUMBER_OF_COLUMNS == NUMBER_OF_COLUMNS-1) {
             printf("\n");
+            number_of_printed_rows++;
         }
     }
 }
@@ -217,23 +221,27 @@ short get_number_of_active_neighbours(bool *state, const short x_coordinate, con
 
     short number_of_active_neighbours = 0;
     bool cell_active;
-    bool not_original_cell;
+    bool is_original_cell;
+    short test_x;
+    short test_y;
 
     // check neighbourhood of original cell by alternating x and y coordinate
     // by ±1
     for (short dx=-1; dx<=1; dx++) {
         for (short dy=-1; dy<=1; dy++) {
-            if (cell_inside_bounds(x_coordinate + dx, y_coordinate + dy)) {
-                cell_active = cell_is_active(state, x_coordinate + dx, y_coordinate + dy);
-                not_original_cell = (dx != 0) && (dy != 0);
+            test_x = x_coordinate + dx;
+            test_y = y_coordinate + dy;
 
-                if (cell_active && not_original_cell) {
+            if (cell_inside_bounds(test_x, test_y)) {
+                cell_active = cell_is_active(state, test_x, test_y);
+                is_original_cell = (dx == 0) && (dy == 0);
+
+                if (cell_active && !(is_original_cell)) {
                     number_of_active_neighbours++;
                 }
             }
         }
     }
-    printf("%d\n", number_of_active_neighbours);
     return number_of_active_neighbours;
 }
 
