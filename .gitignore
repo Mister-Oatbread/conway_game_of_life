@@ -4,6 +4,7 @@
 # except
 !main.c
 !init.c
+!gol.h
 !initial_condition.csv
 !.gitignore
 !LICENSE
