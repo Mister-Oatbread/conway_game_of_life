@@ -31,6 +31,9 @@ int main(void) {
     }
 
     printf("csv created successfully\n");
+    fclose(initial_condition);
+
+    // return zero
     return 0;
 }
 

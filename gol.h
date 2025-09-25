@@ -11,8 +11,8 @@
 #define ACTIVE true
 #define INACTIVE false
 
-#define NUMBER_OF_COLUMNS 4
-#define NUMBER_OF_ROWS 4
+#define NUMBER_OF_COLUMNS 100
+#define NUMBER_OF_ROWS 50
 #define STATE_SIZE NUMBER_OF_COLUMNS*NUMBER_OF_ROWS // 100*50 = 5000
 #define FULL "■"
 #define EMPTY "□"
@@ -25,7 +25,7 @@
 #define MIN2SEC 60
 
 // prototyping main
-void read_apply_initial_condition(bool *state);
+void apply_initial_condition(bool *state);
 void set_cell_status(bool *state, const short x_coordinate, const short y_coordinate, const bool operation);
 void write_cell_state_from_to(bool *next_state, bool *state);
 bool cell_is_active(bool *state, const short x_coordinate, const short y_coordinate);

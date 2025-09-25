@@ -10,17 +10,21 @@
 #include <complex.h>
 #include <time.h>
 #include <locale.h>
+#include <string.h>
 #include "gol.h"
 
 short number_of_printed_rows = 0;
+bool line_delection_active = true;
 
 int main(void) {
 
     setlocale(LC_ALL, "");
     // create 150 x 50 block of cells (STATE_SIZE) in total
     printf("Conway's game of life by Mister Oatbread\n\n");
+
     bool state[STATE_SIZE] = {false};
     bool next_state[STATE_SIZE] = {false};
+    apply_initial_condition(state);
 
     print_state(state);
 
@@ -28,6 +32,7 @@ int main(void) {
     long now;
     update_time(&now);
     long last_update = now;
+
 
     // main loop
     for (;;) {
@@ -38,7 +43,6 @@ int main(void) {
             update_all_cells(state, next_state);
             write_cell_state_from_to(next_state, state);
             print_state(state);
-
         }
     }
 
@@ -50,16 +54,33 @@ int main(void) {
  * this function takes in the "initial_condition.csv" file and writes this initial condition
  * to the initial state.
  */
-void read_apply_initial_condition(bool *state) {
+void apply_initial_condition(bool *state) {
     FILE *initial_condition = fopen("initial_condition.csv", "r");
-    char * line = malloc(SIZE_ENTRY*NUMBER_OF_COLUMNS + 1);
+    short line_size = NUMBER_OF_COLUMNS*SIZE_ENTRY + 2;
+    char line[line_size];
+    int index = 0;
+    int n;
+    char * token;
 
-    int index;
-    for (short x_coordinate = 0; x_coordinate < NUMBER_OF_COLUMNS; x_coordinate++) {
-        for (short y_coordinate = 0; y_coordinate < NUMBER_OF_ROWS; y_coordinate++) {
-            index = calculate_index_with_coordinates(x_coordinate, y_coordinate);
+    for (short row = 1; row <= NUMBER_OF_ROWS; row++) {
+        fgets(line, line_size, initial_condition);
+        token = strtok(line, ",");
+
+        for (short column = 1; column <= NUMBER_OF_COLUMNS; column++) {
+            index = calculate_index_with_coordinates(column, row);
+            n = atoi(token);
+            if (n==1) {
+                *(state+index) = ACTIVE;
+            } else {
+                *(state+index) = INACTIVE;
+            }
+
+            if (column < NUMBER_OF_COLUMNS) {
+                token = strtok(NULL, ",");
+            }
         }
     }
+    fclose(initial_condition);
 }
 
 /**
@@ -132,10 +153,12 @@ int calculate_index_with_coordinates(const short x_coordinate, const short y_coo
  */
 void print_state(bool *state) {
     // TODO: change this to not delete a bunch of stuff at the first iteration
-    for (int index=0; index<number_of_printed_rows; index++) {
-        printf("\033[A\033[2K");
+    if (line_delection_active) {
+        for (int index=0; index<number_of_printed_rows; index++) {
+            printf("\033[A\033[2K");
+        }
+        number_of_printed_rows = 0;
     }
-    number_of_printed_rows = 0;
 
     for (int index=0; index<STATE_SIZE; index++) {
         // check what to print, and add spacer for more visual consisteny between rows and columns
