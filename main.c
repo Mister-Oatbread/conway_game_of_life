@@ -36,7 +36,7 @@ int main(void) {
     // main loop
     for (;;) {
         current_time = clock();
-        if (current_time> last_time + REFRESH_RATE*CLOCK_TIME) {
+        if (current_time> last_time + REFRESH_RATE*CLOCKS_PER_SEC/1000) {
             last_time = clock();
             // TODO: use cooler time
             update_all_cells(state, next_state);

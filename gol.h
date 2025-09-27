@@ -11,14 +11,13 @@
 #define ACTIVE true
 #define INACTIVE false
 
-#define NUMBER_OF_COLUMNS 100
-#define NUMBER_OF_ROWS 50
+#define NUMBER_OF_COLUMNS 5
+#define NUMBER_OF_ROWS 5
 #define STATE_SIZE NUMBER_OF_COLUMNS*NUMBER_OF_ROWS // 100*50 = 5000
-#define FULL "■"
-#define EMPTY " " // "□"
+#define FULL "●"
+#define EMPTY "·"
 
-#define REFRESH_RATE 300 // this is in millis
-#define CLOCK_TIME 1000 // constant that allows refresh rate to be in seconds (probably)
+#define REFRESH_RATE 300 // in milliseconds
 #define SIZE_ENTRY 2*sizeof(char)
 
 #define DAYS2SEC 86400
