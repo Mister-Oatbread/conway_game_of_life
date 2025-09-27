@@ -29,16 +29,15 @@ int main(void) {
     print_state(state);
 
     // set up time, for now this precise to one second
-    long now;
-    update_time(&now);
-    long last_update = now;
-
+    clock_t current_time, last_time;
+    current_time = clock();
+    last_time = current_time;
 
     // main loop
     for (;;) {
-        update_time(&now);
-        if (now > last_update + REFRESH_RATE) {
-            update_time(&last_update);
+        current_time = clock();
+        if (current_time> last_time + REFRESH_RATE*CLOCK_TIME) {
+            last_time = clock();
             // TODO: use cooler time
             update_all_cells(state, next_state);
             write_cell_state_from_to(next_state, state);
@@ -249,20 +248,6 @@ short get_number_of_active_neighbours(bool *state, const short x_coordinate, con
         }
     }
     return number_of_active_neighbours;
-}
-
-/**
- * returns the current time in the time container format
- */
-void update_time(long *p_current_time) {
-    // get time from time_t
-    time_t time_raw;
-    time(&time_raw);
-    struct tm time;
-    time = *(localtime(&time_raw));
-
-    // write to time container
-    *p_current_time = time.tm_mday*DAYS2SEC + time.tm_hour*HOURS2SEC + time.tm_min*MIN2SEC + time.tm_sec;
 }
 
 
