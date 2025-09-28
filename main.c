@@ -180,16 +180,24 @@ void print_state(bool *state) {
  * To evaluate which cells should live or die, use state.
  * To write the decision, use next_state.
  * Later copy everything
+ * The rules are summarized here
+ * decide if cell should be alive or dead in next step
+ * alive and under 2 -> dead
+ * alive and 2 or 3 -> alive
+ * alive and over 3 -> dead
+ * dead and exactly 3 -> alive
  */
 void update_all_cells(bool *state, bool *next_state) {
 
-    int index;
     short number_of_active_neighbours;
+    bool cell_is_alive;
     bool *p_current_cell;
+    int index;
 
     for (short x_coordinate = 1; x_coordinate <= NUMBER_OF_COLUMNS; x_coordinate++) {
         for (short y_coordinate = 1; y_coordinate <= NUMBER_OF_ROWS; y_coordinate++) {
             index = calculate_index_with_coordinates(x_coordinate, y_coordinate);
+            cell_is_alive = *(state+index);
 
             // catch cell that is out of bounds, which should not happen
             if (index == -1) {
@@ -201,21 +209,50 @@ void update_all_cells(bool *state, bool *next_state) {
 
             p_current_cell = next_state+index;
 
-            // decide if cell should be alive or dead in next step
-            // under 2 -> dead
-            // 2 or 3 -> alive
-            // over 3 -> dead
-            // exactly 3 from neighbour -> alive
-            if (number_of_active_neighbours < 2) {
-                *p_current_cell = INACTIVE;
-            } else if (number_of_active_neighbours > 3) {
-                *p_current_cell = INACTIVE;
+            if (cell_is_alive) {
+            // case: cell is alive
+                if (number_of_active_neighbours < 2) {
+                    *p_current_cell = INACTIVE;
+                } else if (number_of_active_neighbours > 3) {
+                    *p_current_cell = INACTIVE;
+                } else {
+                    *p_current_cell = ACTIVE;
+                }
             } else {
-                *p_current_cell = ACTIVE;
+            // case: cell is dead
+                if (number_of_active_neighbours == 3) {
+                    *p_current_cell = ACTIVE;
+                } else {
+                    *p_current_cell = INACTIVE;
+                }
             }
-            // TODO: implement rule with exactly three neighbours.
         }
     }
+}
+
+/**
+ * This function takes a cell and handles it as if it were an inactive cell
+ */
+bool handle_dead_cell(bool *state, short x_coordinate, short y_coordinate) {
+
+    bool cell_status = INACTIVE;
+    bool cell_is_inside_bounds;
+
+    int number_of_active_neighbours;
+    for (short dx=-1; dx<=1; dx++) {
+        for (short dy=-1; dy<=1; dy++) {
+
+            cell_is_inside_bounds = cell_inside_bounds(x_coordinate, y_coordinate);
+            if (!(dx==0 && dy==0) && cell_is_inside_bounds) {
+                number_of_active_neighbours = get_number_of_active_neighbours(state, x_coordinate+dx, y_coordinate+dy);
+                if (number_of_active_neighbours == 3) {
+                    cell_status = ACTIVE;
+                    break;
+                }
+            }
+        }
+    }
+    return cell_status;
 }
 
 /**
