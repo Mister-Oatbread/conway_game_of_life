@@ -21,11 +21,11 @@ int main(void) {
 
     setlocale(LC_ALL, "");
     // create 150 x 50 block of cells (STATE_SIZE) in total
-    printf("Conway's game of life by Mister Oatbread\n\n");
+    printf("Conway's game of life by Mister Oatbread\n");
 
     int seed = time(NULL);
     srand(seed);
-    printf("Seed: %d\n", seed);
+    printf("Seed: %d\n\n", seed);
 
     bool state[STATE_SIZE] = {false};
     bool next_state[STATE_SIZE] = {false};

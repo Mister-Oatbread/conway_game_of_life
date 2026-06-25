@@ -24,16 +24,16 @@
 #define HOURS2SEC 3600
 #define MIN2SEC 60
 
-#define MIN_2STAY_ALIVE 2
-#define MAX_2STAY_ALIVE 4
+#define MIN_2STAY_ALIVE 4
+#define MAX_2STAY_ALIVE 6
 
 #define MIN_2B_BORN 3
-#define MAX_2B_BORN 3
+#define MAX_2B_BORN 5
 
 #define USE_RANDOM_INITIAL_CONDITION true
-#define RANDOM_ALIVE_CHANCE .2
-#define X_BOUNDS .4
-#define Y_BOUNDS .4
+#define RANDOM_ALIVE_CHANCE .4
+#define X_BOUNDS .2
+#define Y_BOUNDS .2
 
 // prototyping main
 void apply_initial_condition(bool* const state);
