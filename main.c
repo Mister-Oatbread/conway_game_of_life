@@ -69,10 +69,10 @@ void apply_initial_condition(bool* const state) {
             for (short column=1; column<=NUMBER_OF_COLUMNS; ++column) {
                 index = calculate_index_with_coordinates(column, row);
                 random_choice = (float)rand()/(float)RAND_MAX;
-                
+
                 if (random_choice <= RANDOM_ALIVE_CHANCE) {
-                    inside_rows = (row >= .25*NUMBER_OF_ROWS) && (row <=.75*NUMBER_OF_ROWS);
-                    inside_columns = (column >= .25*NUMBER_OF_COLUMNS) && (column <=.75*NUMBER_OF_COLUMNS);
+                    inside_rows = (row >= Y_BOUNDS*NUMBER_OF_ROWS) && (row <=(1-Y_BOUNDS)*NUMBER_OF_ROWS);
+                    inside_columns = (column >= X_BOUNDS*NUMBER_OF_COLUMNS) && (column <=(1-X_BOUNDS)*NUMBER_OF_COLUMNS);
                     if (inside_rows && inside_columns) {
                         *(state+index) = ACTIVE;
                     } else {

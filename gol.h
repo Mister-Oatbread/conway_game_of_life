@@ -31,7 +31,9 @@
 #define MAX_2B_BORN 3
 
 #define USE_RANDOM_INITIAL_CONDITION true
-#define RANDOM_ALIVE_CHANCE .1
+#define RANDOM_ALIVE_CHANCE .2
+#define X_BOUNDS .4
+#define Y_BOUNDS .4
 
 // prototyping main
 void apply_initial_condition(bool* const state);
