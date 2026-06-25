@@ -62,10 +62,25 @@ void apply_initial_condition(bool* const state) {
     int index = 0;
 
     if (USE_RANDOM_INITIAL_CONDITION) {
+        float random_choice;
+        bool inside_rows, inside_columns;
+
         for (short row=1; row<=NUMBER_OF_ROWS; ++row) {
             for (short column=1; column<=NUMBER_OF_COLUMNS; ++column) {
                 index = calculate_index_with_coordinates(column, row);
-                *(state+index) = (int)((float)(rand()/(float)RAND_MAX) <= RANDOM_ALIVE_CHANCE);
+                random_choice = (float)rand()/(float)RAND_MAX;
+                
+                if (random_choice <= RANDOM_ALIVE_CHANCE) {
+                    inside_rows = (row >= .25*NUMBER_OF_ROWS) && (row <=.75*NUMBER_OF_ROWS);
+                    inside_columns = (column >= .25*NUMBER_OF_COLUMNS) && (column <=.75*NUMBER_OF_COLUMNS);
+                    if (inside_rows && inside_columns) {
+                        *(state+index) = ACTIVE;
+                    } else {
+                        *(state+index) = INACTIVE;
+                    }
+                } else {
+                    *(state+index) = INACTIVE;
+                }
             }
 
         }
