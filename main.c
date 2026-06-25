@@ -7,11 +7,12 @@
  * Author: Mister Oatbread
  */
 
+#include "gol.h"
+
 #include <complex.h>
 #include <time.h>
 #include <locale.h>
 #include <string.h>
-#include "gol.h"
 
 short number_of_printed_rows = 0;
 bool line_delection_active = true;
@@ -21,6 +22,10 @@ int main(void) {
     setlocale(LC_ALL, "");
     // create 150 x 50 block of cells (STATE_SIZE) in total
     printf("Conway's game of life by Mister Oatbread\n\n");
+
+    int seed = time(NULL);
+    srand(seed);
+    printf("Seed: %d\n", seed);
 
     bool state[STATE_SIZE] = {false};
     bool next_state[STATE_SIZE] = {false};
@@ -53,33 +58,44 @@ int main(void) {
  * this function takes in the "initial_condition.csv" file and writes this initial condition
  * to the initial state.
  */
-void apply_initial_condition(bool *state) {
-    FILE *initial_condition = fopen("initial_condition.csv", "r");
-    short line_size = NUMBER_OF_COLUMNS*SIZE_ENTRY + 2;
-    char line[line_size];
+void apply_initial_condition(bool* const state) {
     int index = 0;
-    int n;
-    char * token;
 
-    for (short row = 1; row <= NUMBER_OF_ROWS; row++) {
-        fgets(line, line_size, initial_condition);
-        token = strtok(line, ",");
-
-        for (short column = 1; column <= NUMBER_OF_COLUMNS; column++) {
-            index = calculate_index_with_coordinates(column, row);
-            n = atoi(token);
-            if (n==1) {
-                *(state+index) = ACTIVE;
-            } else {
-                *(state+index) = INACTIVE;
+    if (USE_RANDOM_INITIAL_CONDITION) {
+        for (short row=1; row<=NUMBER_OF_ROWS; ++row) {
+            for (short column=1; column<=NUMBER_OF_COLUMNS; ++column) {
+                index = calculate_index_with_coordinates(column, row);
+                *(state+index) = (int)((float)(rand()/(float)RAND_MAX) <= RANDOM_ALIVE_CHANCE);
             }
 
-            if (column < NUMBER_OF_COLUMNS) {
-                token = strtok(NULL, ",");
+        }
+    } else {
+        FILE *initial_condition = fopen("initial_condition.csv", "r");
+        short line_size = NUMBER_OF_COLUMNS*SIZE_ENTRY + 2;
+        char line[line_size];
+        int n;
+        char * token;
+
+        for (short row = 1; row <= NUMBER_OF_ROWS; ++row) {
+            fgets(line, line_size, initial_condition);
+            token = strtok(line, ",");
+
+            for (short column = 1; column <= NUMBER_OF_COLUMNS; ++column) {
+                index = calculate_index_with_coordinates(column, row);
+                n = atoi(token);
+                if (n==1) {
+                    *(state+index) = ACTIVE;
+                } else {
+                    *(state+index) = INACTIVE;
+                }
+
+                if (column < NUMBER_OF_COLUMNS) {
+                    token = strtok(NULL, ",");
+                }
             }
         }
+        fclose(initial_condition);
     }
-    fclose(initial_condition);
 }
 
 /**
@@ -87,7 +103,7 @@ void apply_initial_condition(bool *state) {
  * The cell in the top left corner is 1,1; the cell in the bottom right corner is NUMBER_OF_COLUMNS,NUMBER_OF_ROWS
  * (may be 100,50; no guarantees).
  */
-void set_cell_status(bool *state, const short x_coordinate, const short y_coordinate, const bool operation) {
+void set_cell_status(bool* const state, const short x_coordinate, const short y_coordinate, const bool operation) {
     int index = calculate_index_with_coordinates(x_coordinate, y_coordinate);
     if (index != -1) {
         *(state+index) = operation;
@@ -99,8 +115,8 @@ void set_cell_status(bool *state, const short x_coordinate, const short y_coordi
 /**
  * this function performs a deep copy to write one cell array to another
  */
-void write_cell_state_from_to(bool *next_state, bool *state) {
-    for (int i=0; i<STATE_SIZE; i++) {
+void write_cell_state_from_to(bool* const next_state, bool* const state) {
+    for (int i=0; i<STATE_SIZE; ++i) {
         *(state+i) = *(next_state+i);
     }
 }
@@ -109,7 +125,7 @@ void write_cell_state_from_to(bool *next_state, bool *state) {
  * This function returns the state of a cell with given x and y coordinates
  * If the coordinates are out of bounds, false is returned
  */
-bool cell_is_active(bool *state, const short x_coordinate, const short y_coordinate) {
+bool cell_is_active(const bool* const state, const short x_coordinate, const short y_coordinate) {
     bool cell_value;
     int index = calculate_index_with_coordinates(x_coordinate, y_coordinate);
     if (index != -1) {
@@ -150,7 +166,7 @@ int calculate_index_with_coordinates(const short x_coordinate, const short y_coo
 /**
  * Iterate through all state elements and print an
  */
-void print_state(bool *state) {
+void print_state(const bool* const state) {
     // TODO: change this to not delete a bunch of stuff at the first iteration
     if (line_delection_active) {
         for (int index=0; index<number_of_printed_rows; index++) {
@@ -159,7 +175,7 @@ void print_state(bool *state) {
         number_of_printed_rows = 0;
     }
 
-    for (int index=0; index<STATE_SIZE; index++) {
+    for (int index=0; index<STATE_SIZE; ++index) {
         // check what to print, and add spacer for more visual consisteny between rows and columns
         if (*(state+index) == ACTIVE) {
             printf("%s ", FULL);
@@ -187,15 +203,15 @@ void print_state(bool *state) {
  * alive and over 3 -> dead
  * dead and exactly 3 -> alive
  */
-void update_all_cells(bool *state, bool *next_state) {
+void update_all_cells(bool* const state, bool* const next_state) {
 
     short number_of_active_neighbours;
     bool cell_is_alive;
     bool *p_current_cell;
     int index;
 
-    for (short x_coordinate = 1; x_coordinate <= NUMBER_OF_COLUMNS; x_coordinate++) {
-        for (short y_coordinate = 1; y_coordinate <= NUMBER_OF_ROWS; y_coordinate++) {
+    for (short x_coordinate = 1; x_coordinate <= NUMBER_OF_COLUMNS; ++x_coordinate) {
+        for (short y_coordinate = 1; y_coordinate <= NUMBER_OF_ROWS; ++y_coordinate) {
             index = calculate_index_with_coordinates(x_coordinate, y_coordinate);
             cell_is_alive = *(state+index);
 
@@ -211,16 +227,16 @@ void update_all_cells(bool *state, bool *next_state) {
 
             if (cell_is_alive) {
             // case: cell is alive
-                if (number_of_active_neighbours < 2) {
+                if (number_of_active_neighbours < MIN_2STAY_ALIVE) {
                     *p_current_cell = INACTIVE;
-                } else if (number_of_active_neighbours > 3) {
+                } else if (number_of_active_neighbours > MAX_2STAY_ALIVE) {
                     *p_current_cell = INACTIVE;
                 } else {
                     *p_current_cell = ACTIVE;
                 }
             } else {
             // case: cell is dead
-                if (number_of_active_neighbours == 3) {
+                if ((number_of_active_neighbours <= MAX_2B_BORN) && (number_of_active_neighbours >= MIN_2B_BORN)) {
                     *p_current_cell = ACTIVE;
                 } else {
                     *p_current_cell = INACTIVE;
@@ -233,14 +249,14 @@ void update_all_cells(bool *state, bool *next_state) {
 /**
  * This function takes a cell and handles it as if it were an inactive cell
  */
-bool handle_dead_cell(bool *state, short x_coordinate, short y_coordinate) {
+bool handle_dead_cell(bool* const state, const short x_coordinate, const short y_coordinate) {
 
     bool cell_status = INACTIVE;
     bool cell_is_inside_bounds;
 
     int number_of_active_neighbours;
-    for (short dx=-1; dx<=1; dx++) {
-        for (short dy=-1; dy<=1; dy++) {
+    for (short dx=-1; dx<=1; ++dx) {
+        for (short dy=-1; dy<=1; ++dy) {
 
             cell_is_inside_bounds = cell_inside_bounds(x_coordinate, y_coordinate);
             if (!(dx==0 && dy==0) && cell_is_inside_bounds) {
@@ -259,7 +275,7 @@ bool handle_dead_cell(bool *state, short x_coordinate, short y_coordinate) {
  * This function returns the active cell count for a given x and y coordinate
  * Bounds check should ideally happen before.
  */
-short get_number_of_active_neighbours(bool *state, const short x_coordinate, const short y_coordinate) {
+short get_number_of_active_neighbours(const bool* const state, const short x_coordinate, const short y_coordinate) {
 
     short number_of_active_neighbours = 0;
     bool cell_active;
@@ -269,8 +285,8 @@ short get_number_of_active_neighbours(bool *state, const short x_coordinate, con
 
     // check neighbourhood of original cell by alternating x and y coordinate
     // by ±1
-    for (short dx=-1; dx<=1; dx++) {
-        for (short dy=-1; dy<=1; dy++) {
+    for (short dx=-1; dx<=1; ++dx) {
+        for (short dy=-1; dy<=1; ++dy) {
             test_x = x_coordinate + dx;
             test_y = y_coordinate + dy;
 
