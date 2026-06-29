@@ -11,13 +11,15 @@
 #define ACTIVE true
 #define INACTIVE false
 
-#define NUMBER_OF_COLUMNS 118
-#define NUMBER_OF_ROWS 58
+// #define NUMBER_OF_COLUMNS 118
+// #define NUMBER_OF_ROWS 58
+#define NUMBER_OF_COLUMNS 100
+#define NUMBER_OF_ROWS 50
 #define STATE_SIZE NUMBER_OF_COLUMNS*NUMBER_OF_ROWS // 100*50 = 5000
 #define FULL "●"
 #define EMPTY "·"
 
-#define REFRESH_RATE 100 // in milliseconds
+#define REFRESH_RATE 200 // in milliseconds
 #define SIZE_ENTRY 2*sizeof(char)
 
 #define DAYS2SEC 86400
