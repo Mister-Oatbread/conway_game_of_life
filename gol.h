@@ -19,18 +19,18 @@
 #define FULL "●"
 #define EMPTY "·"
 
-#define REFRESH_RATE 200 // in milliseconds
+#define REFRESH_RATE 10 // in milliseconds
 #define SIZE_ENTRY 2*sizeof(char)
 
 #define DAYS2SEC 86400
 #define HOURS2SEC 3600
 #define MIN2SEC 60
 
-#define MIN_2STAY_ALIVE 4
-#define MAX_2STAY_ALIVE 6
+#define MIN_2STAY_ALIVE 2
+#define MAX_2STAY_ALIVE 3
 
 #define MIN_2B_BORN 3
-#define MAX_2B_BORN 5
+#define MAX_2B_BORN 3
 
 #define USE_RANDOM_INITIAL_CONDITION true
 #define RANDOM_ALIVE_CHANCE .4

@@ -48,7 +48,7 @@ int main(void) {
     if (current_row>NUMBER_OF_ROWS) {
         goto end_initialization;
     }
-    
+
     fgets(line, line_size, initial_condition);
     token = strtok(line, ",");
 
@@ -183,20 +183,31 @@ void print_state(const bool* const state) {
         number_of_printed_rows = 0;
     }
 
+    char output[5*STATE_SIZE+NUMBER_OF_COLUMNS];
+    int current_index = 0;
+
     for (int index=0; index<STATE_SIZE; ++index) {
         // check what to print, and add spacer for more visual consisteny between rows and columns
         if (*(state+index) == ACTIVE) {
-            printf("%s ", FULL);
+            memcpy(output+current_index, FULL, 3);
+            current_index += 3;
         } else {
-            printf("%s ", EMPTY);
+            memcpy(output+current_index, EMPTY, 2);
+            current_index += 2;
         }
 
         // at the end of row, insert linebreak
         if (index%NUMBER_OF_COLUMNS == NUMBER_OF_COLUMNS-1) {
-            printf("\n");
-            number_of_printed_rows++;
+            output[current_index] = '\n';
+            ++number_of_printed_rows;
+            ++current_index;
+        } else {
+            output[current_index] = ' ';
+            ++current_index;
         }
+        output[current_index] = '\0';
     }
+    printf("%s",output);
 }
 
 /**
